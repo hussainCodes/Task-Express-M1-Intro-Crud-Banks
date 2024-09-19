@@ -1,4 +1,5 @@
 const AccountSchema = require("../../models/AccountSchema");
+//const { request } = require("./accounts.routes");
 // const accounts = require("../../accounts");
 // const getAllAccounts = (req, res) => {
 //   return res.status(200).json(accounts);
@@ -6,8 +7,16 @@ const AccountSchema = require("../../models/AccountSchema");
 
 const getAllAccounts = async (req, res) => {
   try {
+    const vip = req.query.vip;
     const accounts = await AccountSchema.find();
-    return res.status(200).json({ data: accounts });
+    if (vip) {
+      const vipAccounts = await AccountSchema.find({
+        funds: { $gte: vip },
+      }).exec();
+      return res.status(200).json({ data: vipAccounts });
+    } else {
+      return res.status(200).json({ data: accounts });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error });
